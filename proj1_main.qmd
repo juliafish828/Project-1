@@ -1,0 +1,7 @@
+---
+title: "Project 1 Fish McDowell"
+format: pdf
+editor: visual
+---
+
+This is created so that we are able to work on the project together.
