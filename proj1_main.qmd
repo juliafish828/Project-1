@@ -15,7 +15,7 @@ Data is everywhere. It's power is immeasurable with finding patterns, modeling r
 
 ## Question 1: Selecting Columns
 
-First, we will load in the appropriate data set and select only `area_name`, `STCOU`, and any columns that end with the letter D.
+First, we will load in the appropriate data set and select only `Area_name`, `STCOU`, and any columns that end with the letter D, as this is the only information we need. We will also lower case the `Area_name` variable.
 
 ```{r}
 sec1 <- read_csv("./data/EDU01a.csv", col_names = TRUE)
@@ -28,7 +28,7 @@ sec1_new <- sec1 |>
 head(sec1_new, n = 5)
 ```
 
-The selected columns look to be what we hoped.
+The selected columns look to be what we hoped, with all that aren't `area_name` and `STCOU` end with "D".
 
 ## Question 2: Long Formatted Data
 
@@ -46,8 +46,25 @@ head(sec1_long, n = 5)
 
 This looks to match the pivot that we hoped to make.
 
+## Question 3: Further Splitting Data
+
+As above, we notice that one of the new columns (labeled `r colnames(sec1_long)[3]`) corresponds to the old column names that end with "D". We know that the information in this column represents multiple pieces of information. Namely, the first 3 characters represent the survey, the next 4 represent the value type, and the last 2 digits represent the year of measurement. Knowing this information, we will now parse through those strings and create a new variable with the numeric date represented as YYYY. We will also do that with the first 3 and remaining 4 characters in the string.
 
 
-2. Convert the data into long format where each row has only one enrollment value for that Area_name.
-Display the first 5 rows of your new data set to show that you created this correctly.
+```{r}
+long_updated <- sec1_long |>
+  mutate(
+    year = as.numeric(paste0("19", substr(sec1_long$survey_type, 8, 9))),
+    survey = substr(sec1_long$survey_type, 1, 3),
+    val_type = substr(sec1_long$survey_type, 4, 7)
+  )
+
+head(long_updated, n = 5)
+```
+
+Looking at the head of this data set, we have split the `survey_type` variable into the 3 separate pieces of information that is represents.
+
+
+## Question 4: Splitting Into County and Non-County Data
+
 
