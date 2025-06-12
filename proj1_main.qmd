@@ -28,5 +28,26 @@ sec1_new <- sec1 |>
 head(sec1_new, n = 5)
 ```
 
-The selected columns look to be what we hoped. 
+The selected columns look to be what we hoped.
+
+## Question 2: Long Formatted Data
+
+Next, we will convert this data into long format with only one row per enrollment value for that area name. We will put the column names into a separate new variable to keep that information.
+
+
+```{r}
+sec1_long <- sec1_new |>
+  pivot_longer(cols = 3:12,
+               names_to = "survey_type",
+               values_to = "vals")
+
+head(sec1_long, n = 5)
+```
+
+This looks to match the pivot that we hoped to make.
+
+
+
+2. Convert the data into long format where each row has only one enrollment value for that Area_name.
+Display the first 5 rows of your new data set to show that you created this correctly.
 
