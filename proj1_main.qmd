@@ -78,3 +78,38 @@ head(state_tibble, 10)
 ```
 
 ## Question 5: Creating new variable for county tibble
+
+Next, we want to create a new variable in our county tibble that describes which state the county-level observation corresponds to. In order to do this, we need to get the last two characters in the string area_name, and since this exact number varies based on how many characters are in the county name, we will utilize the nchar() function to determine the starting and stopping point in the subtr() function.
+
+```{r}
+county_tibble <- county_tibble |>
+  mutate(state_name = substr(area_name, nchar(area_name) - 1, nchar(area_name)))
+```
+
+## Question 6: Creating new variable for state tibble
+
+Lastly for the initial data processing part, we want to create a new variable for the state tibble corresponding to the division.
+
+```{r}
+state_tibble <- state_tibble |>
+  mutate(division = case_when(
+    area_name %in% c("CONNECTICUT", "MAINE", "MASSACHUSETTS", "NEW HAMPSHIRE", 
+                     "RHODE ISLAND", "VERMONT") ~ "New England",
+    area_name %in% c("NEW JERSEY", "NEW YORK", "PENNSYLVANIA") ~ "Mid-Atlantic",
+    area_name %in% c("ILLINOIS", "INDIANA", "MICHIGAN", "OHIO", 
+                     "WISCONSIN") ~ "East North Central",
+    area_name %in% c("IOWA", "KANSAS", "MINNESOTA", "MISSOURI", "NEBRASKA",
+                     "NORTH DAKOTA", "SOUTH DAKOTA") ~ "West North Central",
+    area_name %in% c("DELAWARE", "District of Columbia", "DISTRICT OF COLUMBIA",
+                     "FLORIDA", "GEORGIA", "MARYLAND", "NORTH CAROLINA", 
+                     "SOUTH CAROLINA", "VIRGINIA", "WEST VIRGINIA") ~ "South Atlantic",
+    area_name %in% c("ALABAMA", "KENTUCKY", "MISSISSIPPI", 
+                     "TENNESSEE") ~ "East South Central",
+    area_name %in% c("ARKANSAS", "LOUISIANA", "OKLAHOMA", "TEXAS") ~ "West South Central",
+    area_name %in% c("ARIZONA", "COLORADO", "IDAHO", "MONTANA", "NEVADA", 
+                     "NEW MEXICO", "UTAH", "WYOMING") ~ "Mountain",
+    area_name %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON", "WASHINGTON") ~ "Pacific",
+    TRUE ~ "ERROR"
+  ))
+```
+
