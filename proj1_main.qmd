@@ -11,6 +11,8 @@ library(tidyverse)
 
 Data is everywhere. It's power is immeasurable with finding patterns, modeling relationships, and driving decisions. In order to be able to do that, data must be handled appropriately. In this report, we will go through the motions of loading in and preprocessing some data so that it's true power can be used as discussed above.
 
+# Initial Data Cleaning
+
 ## Question 1: Selecting Columns
 
 First, we will load in the appropriate data set and select only `Area_name`, `STCOU`, and any columns that end with the letter D, as this is the only information we need. We will also lower case the `Area_name` variable.
@@ -113,3 +115,80 @@ state_tibble <- state_tibble |>
   ))
 ```
 
+
+# Creating Functions
+
+Now that we have completed the data processing for our first dataset, we want to repeat the same process for our other dataset. Rather than copying and pasting all of our original code, it is much more efficient for us to create functions that can do the above data cleaning for this new dataset.
+
+## Function for steps 1 and 2
+```{r}
+sec1 <- read_csv("./data/EDU01a.csv", col_names = TRUE)
+
+sec1_new <- sec1 |>
+  select(area_name = Area_name,
+         STCOU,
+         ends_with("D"))
+
+head(sec1_new, n = 5)
+
+sec1_long <- sec1_new |>
+  pivot_longer(cols = 3:12,
+               names_to = "survey_type",
+               values_to = "vals")
+
+head(sec1_long, n = 5)
+
+function1and2 <- function(messydata, col_name = )
+```
+
+## Function for step 3
+```{r}
+
+```
+
+## Function for steps 5 and 6
+```{r}
+function5 <- function(county_tibble){
+  county_tibble |>
+    mutate(state_name = substr(area_name, nchar(area_name) - 1, nchar(area_name)))
+}
+
+function6 <- function(state_tibble){
+  state_tibble |>
+      mutate(division = case_when(
+    area_name %in% c("CONNECTICUT", "MAINE", "MASSACHUSETTS", "NEW HAMPSHIRE", 
+                     "RHODE ISLAND", "VERMONT") ~ "New England",
+    area_name %in% c("NEW JERSEY", "NEW YORK", "PENNSYLVANIA") ~ "Mid-Atlantic",
+    area_name %in% c("ILLINOIS", "INDIANA", "MICHIGAN", "OHIO", 
+                     "WISCONSIN") ~ "East North Central",
+    area_name %in% c("IOWA", "KANSAS", "MINNESOTA", "MISSOURI", "NEBRASKA",
+                     "NORTH DAKOTA", "SOUTH DAKOTA") ~ "West North Central",
+    area_name %in% c("DELAWARE", "District of Columbia", "DISTRICT OF COLUMBIA",
+                     "FLORIDA", "GEORGIA", "MARYLAND", "NORTH CAROLINA", 
+                     "SOUTH CAROLINA", "VIRGINIA", "WEST VIRGINIA") ~ "South Atlantic",
+    area_name %in% c("ALABAMA", "KENTUCKY", "MISSISSIPPI", 
+                     "TENNESSEE") ~ "East South Central",
+    area_name %in% c("ARKANSAS", "LOUISIANA", "OKLAHOMA", "TEXAS") ~ "West South Central",
+    area_name %in% c("ARIZONA", "COLORADO", "IDAHO", "MONTANA", "NEVADA", 
+                     "NEW MEXICO", "UTAH", "WYOMING") ~ "Mountain",
+    area_name %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON", "WASHINGTON") ~ "Pacific",
+    TRUE ~ "ERROR"
+  ))
+}
+```
+
+## Function for step 4
+```{r}
+function4 <- function(long_data){
+  subset_index <- grep(pattern = ", \\w\\w", long_data$area_name)
+  state_tibble <- long_data[-subset_index, ]
+  county_tibble <- long_data[subset_index, ]
+  class(county_tibble) <- c("county", class(county_tibble))
+  class(state_tibble) <- c("county", class(state_tibble))
+  function5(county_tibble)
+  function6(state_tibble)
+}
+```
+
+
+## Putting it all into one function call
