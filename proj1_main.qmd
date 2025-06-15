@@ -73,7 +73,7 @@ state_tibble <- long_updated[-subset_index, ]
 county_tibble <- long_updated[subset_index, ]
 
 class(county_tibble) <- c("county", class(county_tibble))
-class(state_tibble) <- c("county", class(state_tibble))
+class(state_tibble) <- c("state", class(state_tibble))
 
 head(county_tibble, 10)
 head(state_tibble, 10)
@@ -123,25 +123,27 @@ Now that we have completed the data processing for our first dataset, we want to
 ## Function for steps 1 and 2
 ```{r}
 function1and2 <- function(messydata, val_name = "vals"){
-  clean_data <- messydata |>
+  long_data <- messydata |>
     select(area_name = Area_name,
          STCOU,
          ends_with("D")) |>
     pivot_longer(cols = 3:12,
                names_to = "survey_type",
                values_to = val_name)
+  return(long_data)
 }
 ```
 
 ## Function for step 3
 ```{r}
-function3 <- function(clean_data){
-  clean_data |>
+function3 <- function(long_data){
+  clean_data <- long_data |>
     mutate(
-    year = as.numeric(paste0("19", substr(sec1_long$survey_type, 8, 9))),
-    survey = substr(sec1_long$survey_type, 1, 3),
-    val_type = substr(sec1_long$survey_type, 4, 7)
+    year = as.numeric(paste0("19", substr(long_data$survey_type, 8, 9))),
+    survey = substr(long_data$survey_type, 1, 3),
+    val_type = substr(long_data$survey_type, 4, 7)
   )
+  return(clean_data)
 }
 ```
 
@@ -150,6 +152,7 @@ function3 <- function(clean_data){
 function5 <- function(county_tibble){
   county_tibble |>
     mutate(state_name = substr(area_name, nchar(area_name) - 1, nchar(area_name)))
+  return(county_tibble)
 }
 
 function6 <- function(state_tibble){
@@ -173,6 +176,7 @@ function6 <- function(state_tibble){
     area_name %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON", "WASHINGTON") ~ "Pacific",
     TRUE ~ "ERROR"
   ))
+  return(county_tibble)
 }
 ```
 
@@ -183,11 +187,39 @@ function4 <- function(clean_data){
   state_tibble <- clean_data[-subset_index, ]
   county_tibble <- clean_data[subset_index, ]
   class(county_tibble) <- c("county", class(county_tibble))
-  class(state_tibble) <- c("county", class(state_tibble))
+  class(state_tibble) <- c("state", class(state_tibble))
   function5(county_tibble)
   function6(state_tibble)
+  return(list(county = county_tibble, state = state_tibble))
 }
 ```
 
 
-## Putting it all into one function call
+## Putting it all into one function
+
+Now that we have created functions that do all of the data cleaning we want, we want to combine everything into one big function that does everything for us. 
+```{r}
+my_wrapper <- function(url, default_var_name = "vals"){
+  final <- read_csv(url, col_names = TRUE) |>
+    function1and2() |>
+    function3() |>
+    function4()
+  return(final)
+}
+```
+
+Now we can call this new function for both of our datasets and combine them.
+```{r}
+data1 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv")
+data2 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.csv")
+
+combined_data <- function(data1, data2){
+  combined_county <- dplyr::bind_rows(data1$county, data2$county)
+  combined_state <- dplyr::bind_rows(data1$state, data2$state)
+  return(list(county = combined_county, state = combined_state))
+}
+
+combined_data(data1, data2)
+```
+
+
