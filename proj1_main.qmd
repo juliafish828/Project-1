@@ -157,13 +157,13 @@ function3 <- function(long_data){
 
 ```{r}
 function5 <- function(county_tibble){
-  county_tibble |>
+  county_tibble <- county_tibble |>
     mutate(state_name = substr(area_name, nchar(area_name) - 1, nchar(area_name)))
   return(county_tibble)
 }
 
 function6 <- function(state_tibble){
-  state_tibble |>
+  state_tibble <- state_tibble |>
       mutate(division = case_when(
     area_name %in% c("CONNECTICUT", "MAINE", "MASSACHUSETTS", "NEW HAMPSHIRE", 
                      "RHODE ISLAND", "VERMONT") ~ "New England",
@@ -200,9 +200,9 @@ function4 <- function(clean_data){
   county_tibble <- clean_data[subset_index, ]
   class(county_tibble) <- c("county", class(county_tibble))
   class(state_tibble) <- c("state", class(state_tibble))
-  function5(county_tibble)
-  function6(state_tibble)
-  return(list(county = county_tibble, state = state_tibble))
+  county <- function5(county_tibble)
+  state <- function6(state_tibble)
+  return(list(county = county, state = state))
 }
 ```
 
@@ -323,7 +323,11 @@ data2 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.csv")
 data12 <- combined_data(data1, data2)
 
 # plot the state data frame
-# plot.state(data12[[1]])
+plot.state(data12[[2]])
+plot.county(data12[[1]], state = "NC", side = "top", amount = 20)
+plot.county(data12[[1]], state = "SC", side = "bottom", amount = 7)
+plot.county(data12[[1]])
+plot.county(data12[[1]], state = "PA", side = "top", amount = 8)
 ```
 
 
