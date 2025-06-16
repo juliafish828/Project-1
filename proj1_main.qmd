@@ -153,21 +153,6 @@ function3 <- function(long_data){
 }
 ```
 
-## Function for step 4
-
-```{r}
-function4 <- function(clean_data){
-  subset_index <- grep(pattern = ", \\w\\w", clean_data$area_name)
-  state_tibble <- clean_data[-subset_index, ]
-  county_tibble <- clean_data[subset_index, ]
-  class(county_tibble) <- c("county", class(county_tibble))
-  class(state_tibble) <- c("state", class(state_tibble))
-  function5(county_tibble)
-  function6(state_tibble)
-  return(list(county = county_tibble, state = state_tibble))
-}
-```
-
 ## Function for steps 5 and 6
 
 ```{r}
@@ -202,7 +187,22 @@ function6 <- function(state_tibble){
                      "WASHINGTON") ~ "Pacific",
     TRUE ~ "ERROR"
   ))
-  return(county_tibble)
+  return(state_tibble)
+}
+```
+
+## Function for step 4
+
+```{r}
+function4 <- function(clean_data){
+  subset_index <- grep(pattern = ", \\w\\w", clean_data$area_name)
+  state_tibble <- clean_data[-subset_index, ]
+  county_tibble <- clean_data[subset_index, ]
+  class(county_tibble) <- c("county", class(county_tibble))
+  class(state_tibble) <- c("state", class(state_tibble))
+  function5(county_tibble)
+  function6(state_tibble)
+  return(list(county = county_tibble, state = state_tibble))
 }
 ```
 
