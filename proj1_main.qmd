@@ -38,7 +38,7 @@ Next, we will convert this data into long format with only one row per enrollmen
 sec1_long <- sec1_new |>
   pivot_longer(cols = 3:12,
                names_to = "survey_type",
-               values_to = "vals")
+               values_to = "enrollment")
 
 head(sec1_long, n = 5)
 ```
@@ -64,7 +64,7 @@ Looking at the head of this data set, we have split the `survey_type` variable i
 
 ## Question 4: Splitting Into County and Non-County Data
 
-Next, we want to create two datasets, with one containing only non-county data, and the other containing only county data. We are able to do this based on how the area_name column is set up, and we also want to create new variables corresponding to either the county or state based on which dataset it is placed into.
+Next, we want to create two datasets, with one containing only non-county data, and the other containing only county data. We are able to do this based on how the `area_name` column is set up. We also want to create new variables corresponding to either the county or state based on which dataset it is placed into.
 
 ```{r}
 subset_index <- grep(pattern = ", \\w\\w", long_updated$area_name)
@@ -122,7 +122,7 @@ Now that we have completed the data processing for our first dataset, we want to
 
 ## Function for steps 1 and 2
 ```{r}
-function1and2 <- function(messydata, val_name = "vals"){
+function1and2 <- function(messydata, val_name = "enrollment"){
   long_data <- messydata |>
     select(area_name = Area_name,
          STCOU,
@@ -144,6 +144,20 @@ function3 <- function(long_data){
     val_type = substr(long_data$survey_type, 4, 7)
   )
   return(clean_data)
+}
+```
+
+## Function for step 4
+```{r}
+function4 <- function(clean_data){
+  subset_index <- grep(pattern = ", \\w\\w", clean_data$area_name)
+  state_tibble <- clean_data[-subset_index, ]
+  county_tibble <- clean_data[subset_index, ]
+  class(county_tibble) <- c("county", class(county_tibble))
+  class(state_tibble) <- c("state", class(state_tibble))
+  function5(county_tibble)
+  function6(state_tibble)
+  return(list(county = county_tibble, state = state_tibble))
 }
 ```
 
@@ -180,26 +194,12 @@ function6 <- function(state_tibble){
 }
 ```
 
-## Function for step 4
-```{r}
-function4 <- function(clean_data){
-  subset_index <- grep(pattern = ", \\w\\w", clean_data$area_name)
-  state_tibble <- clean_data[-subset_index, ]
-  county_tibble <- clean_data[subset_index, ]
-  class(county_tibble) <- c("county", class(county_tibble))
-  class(state_tibble) <- c("state", class(state_tibble))
-  function5(county_tibble)
-  function6(state_tibble)
-  return(list(county = county_tibble, state = state_tibble))
-}
-```
-
 
 ## Putting it all into one function
 
 Now that we have created functions that do all of the data cleaning we want, we want to combine everything into one big function that does everything for us. 
 ```{r}
-my_wrapper <- function(url, default_var_name = "vals"){
+my_wrapper <- function(url, default_var_name = "enrollment"){
   final <- read_csv(url, col_names = TRUE) |>
     function1and2() |>
     function3() |>
@@ -222,4 +222,84 @@ combined_data <- function(data1, data2){
 combined_data(data1, data2)
 ```
 
+
+Now, we will make a function for plotting the objects that comes out of these functions we have written above. We will start with the `state` tibble. Our goal is to plot the average value of a specified numeric variable within the data frame input into the function. These average values will also be computed by geographic division and year.
+
+```{r}
+plot.state <- function(state_data, var_name = "enrollment"){
+  
+  #get rid of errors
+  state_sum <- state_data |>
+    filter(division != "ERROR") |>
+    group_by(division, year) |>
+    mutate(avg_vals = mean(get(var_name), na.rm = TRUE))
+  
+  #use ggplot to plot
+  state_sum |>
+    ggplot(aes(x = year, y = avg_vals, color = division)) +
+    geom_line() +
+    labs(title = paste("Mean of", var_name, "by Division and Year"),
+         x = "Year",
+         y = paste("Average"), var_name)
+}
+plot.state(data.frame(state_tibble))
+```
+
+
+We will now make a function to plot the county data as well.
+
+For the class county we’ll do a similar plotting function but with more flexibility. This function should allow
+the user to:
+• specify the state of interest, giving a default value if not specified
+• determine whether the ‘top’ or ‘bottom’ most counties should be looked at with a default for ‘top’
+• instruct how many of the ‘top’ or ‘bottom’ will be investigated with a default value of 5
+Within your plot function you should:
+• filter the data to only include data from the state specified
+• find the overall mean of the statistic (use get(var_name) here as well) for each Area_name and sort
+those values from largest to smallest if ‘top’ is specified or smallest to largest if ‘bottom’ is specified
+• obtain the top or bottom x number of Area_names from the previous step where x is given by the user
+or the default
+• filter the data for this state to only include the Area_name’s from the previous part (this is the data
+we’ll use to plot)
+Notice we aren’t plotting the means here, but the actual statistic’s value. Test out this function by running
+plot(_class_county_df_here_). Run it a few more times specifying different input arguments. (This
+doesn’t need to go into the report here, just make sure it is working!)
+
+
+
+```{r}
+plot.county <- function(county_data, var_name = "enrollment", state = "NC",
+                        side = "top", amount = 5){
+  county_sum <- county_data |>
+    filter(state_name == state) |>
+    group_by(area_name) |>
+    summarize(avg_vals = mean(get(var_name), na.rm = TRUE))
+    
+    if (side == "top"){
+      which_counties <- county_sum |>
+        arrange(desc(avg_vals)) |>
+        slice_head(n = amount) |>
+        pull(area_name)
+    } else if (side == "bottom"){
+      which_counties <- county_sum |>
+        arrange(desc(avg_vals)) |>
+        slice_head(n = amount) |>
+        pull(area_name)
+    }
+    
+  plot_data <- county_data |>
+    filter(area_name %in% which_counties)
+    
+
+  ggplot(plot_data, aes(x = year, y = get(var_name), color = area_name)) +
+    geom_line() +
+    labs(title = paste(side, amount, "Counties in", state, "by", var_name),
+      x = "Year",
+      y = paste(var_name, "values"),
+      color = "County"
+    )
+}
+
+plot.county(county_tibble, state = "AL", amount = 7)
+```
 
