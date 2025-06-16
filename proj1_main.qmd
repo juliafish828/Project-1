@@ -9,7 +9,7 @@ editor: visual
 library(tidyverse)
 ```
 
-Data is everywhere. It's power is immeasurable with finding patterns, modeling relationships, and driving decisions. In order to be able to do that, data must be handled appropriately. In this report, we will go through the motions of loading in and preprocessing some data so that it's true power can be used as discussed above.
+Data is everywhere. Its power is immeasurable with finding patterns, modeling relationships, and driving decisions. In order to be able to do those things, data must be handled appropriately. In this report, we will go through the motions of loading in and preprocessing some data so that its true power can be used as discussed above.
 
 # Initial Data Cleaning
 
@@ -43,11 +43,11 @@ sec1_long <- sec1_new |>
 head(sec1_long, n = 5)
 ```
 
-This looks to match the pivot that we hoped to make.
+This looks to match the pivot we hoped to make.
 
 ## Question 3: Further Splitting Data
 
-As above, we notice that one of the new columns (labeled `r colnames(sec1_long)[3]`) corresponds to the old column names that end with "D". We know that the information in this column represents multiple pieces of information. Namely, the first 3 characters represent the survey, the next 4 represent the value type, and the last 2 digits represent the year of measurement. Knowing this information, we will now parse through those strings and create a new variable with the numeric date represented as YYYY. We will also do that with the first 3 and remaining 4 characters in the string.
+As above, we notice that the entries of one of the new columns (labeled `r colnames(sec1_long)[3]`) corresponds to the old column names that end with "D". We know that the information in this column represents multiple pieces of information. Namely, the first 3 characters represent the survey, the next 4 represent the value type, and the last 2 digits represent the year of measurement. Knowing this information, we will now parse through those strings and create a new variable with the numeric date represented as YYYY. We will also do that with the first 3 and remaining 4 characters in the string.
 
 ```{r}
 long_updated <- sec1_long |>
@@ -60,7 +60,7 @@ long_updated <- sec1_long |>
 head(long_updated, n = 5)
 ```
 
-Looking at the head of this data set, we have split the `survey_type` variable into the 3 separate pieces of information that is represents.
+Looking at the head of this data set, we have split the `survey_type` variable into the 3 separate pieces of information that it represents.
 
 ## Question 4: Splitting Into County and Non-County Data
 
@@ -125,6 +125,7 @@ state_tibble <- state_tibble |>
 Now that we have completed the data processing for our first dataset, we want to repeat the same process for our other dataset. Rather than copying and pasting all of our original code, it is much more efficient for us to create functions that can do the above data cleaning for this new dataset.
 
 ## Function for steps 1 and 2
+
 ```{r}
 function1and2 <- function(messydata, val_name = "enrollment"){
   long_data <- messydata |>
@@ -139,6 +140,7 @@ function1and2 <- function(messydata, val_name = "enrollment"){
 ```
 
 ## Function for step 3
+
 ```{r}
 function3 <- function(long_data){
   clean_data <- long_data |>
@@ -152,6 +154,7 @@ function3 <- function(long_data){
 ```
 
 ## Function for step 4
+
 ```{r}
 function4 <- function(clean_data){
   subset_index <- grep(pattern = ", \\w\\w", clean_data$area_name)
@@ -166,6 +169,7 @@ function4 <- function(clean_data){
 ```
 
 ## Function for steps 5 and 6
+
 ```{r}
 function5 <- function(county_tibble){
   county_tibble |>
@@ -205,7 +209,8 @@ function6 <- function(state_tibble){
 
 ## Putting it all into one function
 
-Now that we have created functions that do all of the data cleaning we want, we want to combine everything into one big function that does everything for us. 
+Now that we have created functions that do all of the data cleaning we want, we want to combine everything into one big function that does everything for us.
+
 ```{r}
 my_wrapper <- function(url, default_var_name = "enrollment"){
   final <- read_csv(url, col_names = TRUE) |>
@@ -217,6 +222,7 @@ my_wrapper <- function(url, default_var_name = "enrollment"){
 ```
 
 Now we can call this new function for both of our datasets and combine them.
+
 ```{r}
 data1 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv")
 data2 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.csv")
@@ -230,6 +236,7 @@ combined_data <- function(data1, data2){
 combined_data(data1, data2)
 ```
 
+## Functions for plotting
 
 Now, we will make a function for plotting the objects that comes out of these functions we have written above. We will start with the `state` tibble. Our goal is to plot the average value of a specified numeric variable within the data frame input into the function. These average values will also be computed by geographic division and year.
 
@@ -254,7 +261,7 @@ plot.state(data.frame(state_tibble))
 ```
 
 
-We will now make a function to plot the county data as well.
+We will now make a function to plot the county data as well. This function will allow the user to specify the state that they want to plot (with a default to NC), whether they want to plot the counties with the highest or lowest average enrollment values, and how many of those counties they wish to incorporate.
 
 
 ```{r}
@@ -292,4 +299,31 @@ plot.county <- function(county_data, var_name = "enrollment", state = "NC",
 
 plot.county(county_tibble, state = "AL", amount = 7)
 ```
+
+## Putting it all together
+
+We will now utilize all of the functions we have written to take in raw data, preprocess it, split it into two tibbles, and plot them accordingly. Some examples are below.
+
+• Run your data processing function on the two enrollment URLs given previously, specifying an appropriate name for the enrollment data column.
+• Run your data combining function to put these into one object (with two data frames)
+– Use appropriate indexing (ex. [[1]]) to reference the correct data frame
+• Use the plot function on the state data frame
+• Use the plot function on the county data frame
+– Once specifying the state to be “NC”, the group being the top, the number looked at being 20
+– Once specifying the state to be “SC”, the group being the bottom, the number looked at being 7
+– Once without specifying anything (defaults used)
+– Once specifying the state to be “PA”, the group being the top, the number looked at being 8
+
+```{r}
+# run data processing function on the two enrollment URLs given previously
+data1 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01a.csv")
+data2 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/EDU01b.csv")
+
+# run the data combining function
+data12 <- combined_data(data1, data2)
+
+# plot the state data frame
+# plot.state(data12[[1]])
+```
+
 
