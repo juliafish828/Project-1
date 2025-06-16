@@ -302,17 +302,8 @@ plot.county(county_tibble, state = "AL", amount = 7)
 
 ## Putting it all together
 
-We will now utilize all of the functions we have written to take in raw data, preprocess it, split it into two tibbles, and plot them accordingly. Some examples are below.
+We will now utilize all of the functions we have written to take in raw data, preprocess it, split it into two tibbles, combine multiple of those split tibbles, and plot them accordingly. Some examples are below.
 
-• Run your data processing function on the two enrollment URLs given previously, specifying an appropriate name for the enrollment data column.
-• Run your data combining function to put these into one object (with two data frames)
-– Use appropriate indexing (ex. [[1]]) to reference the correct data frame
-• Use the plot function on the state data frame
-• Use the plot function on the county data frame
-– Once specifying the state to be “NC”, the group being the top, the number looked at being 20
-– Once specifying the state to be “SC”, the group being the bottom, the number looked at being 7
-– Once without specifying anything (defaults used)
-– Once specifying the state to be “PA”, the group being the top, the number looked at being 8
 
 ```{r}
 # run data processing function on the two enrollment URLs given previously
@@ -329,5 +320,25 @@ plot.county(data12[[1]], state = "SC", side = "bottom", amount = 7)
 plot.county(data12[[1]])
 plot.county(data12[[1]], state = "PA", side = "top", amount = 8)
 ```
+
+Lastly, we will start with 4 new URLs and go all the way through this process again.
+
+```{r}
+data3 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01a.csv")
+data4 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01b.csv")
+data5 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01c.csv")
+data6 <- my_wrapper("https://www4.stat.ncsu.edu/~online/datasets/PST01d.csv")
+
+data34 <- combined_data(data3, data4)
+data345 <- combined_data(data34, data5)
+data_all <- combined_data(data345, data6)
+
+plot.state(data_all[[2]])
+plot.county(data_all[[1]], state = "CA", side = "top", amount = 15)
+plot.county(data_all[[1]], state = "TX", side = "top", amount = 4)
+plot.county(data_all[[1]])
+plot.county(data_all[[1]], state = "NY", side = "top", amount = 10)
+```
+
 
 
