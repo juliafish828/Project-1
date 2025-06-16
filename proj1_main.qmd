@@ -97,20 +97,24 @@ state_tibble <- state_tibble |>
   mutate(division = case_when(
     area_name %in% c("CONNECTICUT", "MAINE", "MASSACHUSETTS", "NEW HAMPSHIRE", 
                      "RHODE ISLAND", "VERMONT") ~ "New England",
-    area_name %in% c("NEW JERSEY", "NEW YORK", "PENNSYLVANIA") ~ "Mid-Atlantic",
+    area_name %in% c("NEW JERSEY", "NEW YORK",
+                     "PENNSYLVANIA") ~ "Mid-Atlantic",
     area_name %in% c("ILLINOIS", "INDIANA", "MICHIGAN", "OHIO", 
                      "WISCONSIN") ~ "East North Central",
     area_name %in% c("IOWA", "KANSAS", "MINNESOTA", "MISSOURI", "NEBRASKA",
                      "NORTH DAKOTA", "SOUTH DAKOTA") ~ "West North Central",
-    area_name %in% c("DELAWARE", "District of Columbia", "DISTRICT OF COLUMBIA",
-                     "FLORIDA", "GEORGIA", "MARYLAND", "NORTH CAROLINA", 
-                     "SOUTH CAROLINA", "VIRGINIA", "WEST VIRGINIA") ~ "South Atlantic",
+    area_name %in% c("DELAWARE", "District of Columbia",
+                     "DISTRICT OF COLUMBIA", "FLORIDA", "GEORGIA",
+                     "MARYLAND", "NORTH CAROLINA", "SOUTH CAROLINA",
+                     "VIRGINIA", "WEST VIRGINIA") ~ "South Atlantic",
     area_name %in% c("ALABAMA", "KENTUCKY", "MISSISSIPPI", 
                      "TENNESSEE") ~ "East South Central",
-    area_name %in% c("ARKANSAS", "LOUISIANA", "OKLAHOMA", "TEXAS") ~ "West South Central",
+    area_name %in% c("ARKANSAS", "LOUISIANA", "OKLAHOMA",
+                     "TEXAS") ~ "West South Central",
     area_name %in% c("ARIZONA", "COLORADO", "IDAHO", "MONTANA", "NEVADA", 
                      "NEW MEXICO", "UTAH", "WYOMING") ~ "Mountain",
-    area_name %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON", "WASHINGTON") ~ "Pacific",
+    area_name %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON",
+                     "WASHINGTON") ~ "Pacific",
     TRUE ~ "ERROR"
   ))
 ```
@@ -174,20 +178,24 @@ function6 <- function(state_tibble){
       mutate(division = case_when(
     area_name %in% c("CONNECTICUT", "MAINE", "MASSACHUSETTS", "NEW HAMPSHIRE", 
                      "RHODE ISLAND", "VERMONT") ~ "New England",
-    area_name %in% c("NEW JERSEY", "NEW YORK", "PENNSYLVANIA") ~ "Mid-Atlantic",
+    area_name %in% c("NEW JERSEY", "NEW YORK",
+                     "PENNSYLVANIA") ~ "Mid-Atlantic",
     area_name %in% c("ILLINOIS", "INDIANA", "MICHIGAN", "OHIO", 
                      "WISCONSIN") ~ "East North Central",
     area_name %in% c("IOWA", "KANSAS", "MINNESOTA", "MISSOURI", "NEBRASKA",
                      "NORTH DAKOTA", "SOUTH DAKOTA") ~ "West North Central",
-    area_name %in% c("DELAWARE", "District of Columbia", "DISTRICT OF COLUMBIA",
-                     "FLORIDA", "GEORGIA", "MARYLAND", "NORTH CAROLINA", 
-                     "SOUTH CAROLINA", "VIRGINIA", "WEST VIRGINIA") ~ "South Atlantic",
+    area_name %in% c("DELAWARE", "District of Columbia",
+                     "DISTRICT OF COLUMBIA", "FLORIDA", "GEORGIA",
+                     "MARYLAND", "NORTH CAROLINA", "SOUTH CAROLINA",
+                     "VIRGINIA", "WEST VIRGINIA") ~ "South Atlantic",
     area_name %in% c("ALABAMA", "KENTUCKY", "MISSISSIPPI", 
                      "TENNESSEE") ~ "East South Central",
-    area_name %in% c("ARKANSAS", "LOUISIANA", "OKLAHOMA", "TEXAS") ~ "West South Central",
+    area_name %in% c("ARKANSAS", "LOUISIANA", "OKLAHOMA",
+                     "TEXAS") ~ "West South Central",
     area_name %in% c("ARIZONA", "COLORADO", "IDAHO", "MONTANA", "NEVADA", 
                      "NEW MEXICO", "UTAH", "WYOMING") ~ "Mountain",
-    area_name %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON", "WASHINGTON") ~ "Pacific",
+    area_name %in% c("ALASKA", "CALIFORNIA", "HAWAII", "OREGON",
+                     "WASHINGTON") ~ "Pacific",
     TRUE ~ "ERROR"
   ))
   return(county_tibble)
@@ -247,24 +255,6 @@ plot.state(data.frame(state_tibble))
 
 
 We will now make a function to plot the county data as well.
-
-For the class county we’ll do a similar plotting function but with more flexibility. This function should allow
-the user to:
-• specify the state of interest, giving a default value if not specified
-• determine whether the ‘top’ or ‘bottom’ most counties should be looked at with a default for ‘top’
-• instruct how many of the ‘top’ or ‘bottom’ will be investigated with a default value of 5
-Within your plot function you should:
-• filter the data to only include data from the state specified
-• find the overall mean of the statistic (use get(var_name) here as well) for each Area_name and sort
-those values from largest to smallest if ‘top’ is specified or smallest to largest if ‘bottom’ is specified
-• obtain the top or bottom x number of Area_names from the previous step where x is given by the user
-or the default
-• filter the data for this state to only include the Area_name’s from the previous part (this is the data
-we’ll use to plot)
-Notice we aren’t plotting the means here, but the actual statistic’s value. Test out this function by running
-plot(_class_county_df_here_). Run it a few more times specifying different input arguments. (This
-doesn’t need to go into the report here, just make sure it is working!)
-
 
 
 ```{r}
