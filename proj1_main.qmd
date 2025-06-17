@@ -127,6 +127,8 @@ Now that we have completed the data processing for our first dataset, we want to
 
 ## Function for steps 1 and 2
 
+We want the first function that we create to select the desired columns, and to convert the data into long format with one row per enrollment value for the area names. We are setting a default name for our new values column to be called "enrollment", and this can be changed as desired if we wanted to call it something else.
+
 ```{r}
 function1and2 <- function(messydata, val_name = "enrollment"){
   long_data <- messydata |>
@@ -142,6 +144,8 @@ function1and2 <- function(messydata, val_name = "enrollment"){
 
 ## Function for step 3
 
+Next, we want to write a function that does the task of further splitting the data that we performed in step 3 where we split up the survery type into the different components of year and survey/value type.
+
 ```{r}
 function3 <- function(long_data){
   clean_data <- long_data |>
@@ -155,6 +159,8 @@ function3 <- function(long_data){
 ```
 
 ## Function for steps 5 and 6
+
+Next, we want to write a function that does both the tasks in 5 and 6, where we altered the tibbles for the county and non county level data.
 
 ```{r}
 function5 <- function(county_tibble){
@@ -194,6 +200,8 @@ function6 <- function(state_tibble){
 ```
 
 ## Function for step 4
+
+Finally, we write a function that completes step 4 and creates the 2 separate datasets for county and state level data while using functions 5 and 6.
 
 ```{r}
 function4 <- function(clean_data){
@@ -302,7 +310,7 @@ plot.county <- function(county_data, var_name = "enrollment", state = "NC",
 plot.county(county_tibble, state = "AL", amount = 7)
 ```
 
-## Putting it all together
+# Putting it all together
 
 We will now utilize all of the functions we have written to take in raw data, preprocess it, split it into two tibbles, combine multiple of those split tibbles, and plot them accordingly. Some examples are below.
 
