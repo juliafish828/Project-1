@@ -53,8 +53,7 @@ As above, we notice that the entries of one of the new columns (labeled `r colna
 long_updated <- sec1_long |>
   mutate(
     year = as.numeric(paste0("19", substr(sec1_long$survey_type, 8, 9))),
-    survey = substr(sec1_long$survey_type, 1, 3),
-    val_type = substr(sec1_long$survey_type, 4, 7)
+    measurement = substr(sec1_long$survey_type, 1, 7)
   )
 
 head(long_updated, n = 5)
